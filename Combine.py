@@ -83,7 +83,7 @@ for filename in os.listdir(dirExtract1):
     log("Procssing sub-folder '" + fName + "'")
 
     if os.path.isdir(fName):
-        # This should be a year directory. Iterate over it.
+        # This should be a year directory. Loop through and extract all zip files.
         for filename2 in os.listdir(fName):
             filenameZip = os.path.join(fName, filename2)
 
@@ -102,15 +102,15 @@ for filename in os.listdir(dirExtract1):
 
 log("Finished processing sub-folder zip files.")
 
-# Now loop through all the DAT files, open them, read the B record, then write to the combined output file.
+# Now loop through all the DAT files, open them, read the B records, then write to the combined output file.
 
-# Open the output file and write the field names.
+# Open the output file and write a line containing the field names.
 out = open(outFile, 'w') 
 colHeader = "Record Type;District Code;Property ID;Sale Counter;Download Datetime;Property Name;Unit Number;House Number;Street Name;Locality;Post Code;Area;Area Type;Contract Date;Settlement Date;Purchase Price;Zoning;Nature of Property;Primary Purpose;Strata Lot Number;Component Code;Sale Code;Interest Percent;Dealing Number;Unknown Field"
 out.write(colHeader)
 out.write("\n")
 
-# Loop through all the individual files (mostly DAT files).
+# Loop through all the individual files (should be almost all DAT files).
 for filename in os.listdir(dirExtract2):
     fName = os.path.join(dirExtract2, filename)
     
@@ -123,11 +123,13 @@ for filename in os.listdir(dirExtract2):
             readFile = open(fName, "r")
             lines = readFile.readlines()
   
-            # Read each line in the file and process it if it's a B record.
+            # Read each line in the file and process B records.
             for line in lines:
                 if line[0:1] == "B":
                     # This is B record so write it to the file.
                     out.write (line)
         
         else:
-            log ("Not a dat file: '" + fName + "'")    
+            log ("Not a dat file, skipping: '" + fName + "'")    
+
+log("Finished writing the combined file.")
