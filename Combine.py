@@ -56,10 +56,12 @@ createDir(dirExtract3)
 os.chdir(dirExtract1)
 
 # Loop through year files in the DAT file directory.
+count = 0
 for filename in os.listdir(dirDATFiles):
     fName = os.path.join(dirDATFiles, filename)
 
     if zipfile.is_zipfile(fName):
+        count += 1
         # Valid zip file so open it.
         with zipfile.ZipFile(fName, 'r') as zFile:
             # Extract all the files. 
@@ -69,15 +71,16 @@ for filename in os.listdir(dirDATFiles):
     else:
         log ("Not a zip file: '" + fName + "'")
 
-log("Finished processing top level zip files.")
+log("Finished processing top level zip files: " + str(count) + " files")
 
 # Now that all year files have been extracted, loop through each year folder and extract the zip files.
+
+log("Starting to process sub-folder zip files.")
 
 # Change the working directory.
 os.chdir(dirExtract2)
 
-log("Starting to process sub-folder zip files.")
-
+count = 0
 for filename in os.listdir(dirExtract1):
     fName = os.path.join(dirExtract1, filename)
     log("Procssing sub-folder '" + fName + "'")
@@ -89,6 +92,7 @@ for filename in os.listdir(dirExtract1):
 
             if zipfile.is_zipfile(filenameZip):
                 # Valid zip file so open it.
+                count += 1
                 with zipfile.ZipFile(filenameZip, 'r') as zFile:
                     # Extract all the files. 
                     log ("Unzipping '" + filenameZip + "'")
@@ -100,16 +104,19 @@ for filename in os.listdir(dirExtract1):
     else:
         log ("Not a directory: '" + fName + "'")  
 
-log("Finished processing sub-folder zip files.")
+log("Finished processing sub-folder zip files: " + str(count) + " files")
 
 # Now loop through all the DAT files, open them, read the B records, then write to the combined output file.
 
 # Open the output file and write a line containing the field names.
+log("Starting to process dat files.")
+
 out = open(outFile, 'w') 
 colHeader = "Record Type;District Code;Property ID;Sale Counter;Download Datetime;Property Name;Unit Number;House Number;Street Name;Locality;Post Code;Area;Area Type;Contract Date;Settlement Date;Purchase Price;Zoning;Nature of Property;Primary Purpose;Strata Lot Number;Component Code;Sale Code;Interest Percent;Dealing Number;Unknown Field"
 out.write(colHeader)
 out.write("\n")
 
+count = 0
 # Loop through all the individual files (should be almost all DAT files).
 for filename in os.listdir(dirExtract2):
     fName = os.path.join(dirExtract2, filename)
@@ -118,6 +125,7 @@ for filename in os.listdir(dirExtract2):
         # Valid file, check to see if it's a DAT file.
         if fName[-3:].lower() == "dat":
             log("Procssing file '" + fName + "'")
+            count += 1
 
             # Open the file and begin reading it.
             readFile = open(fName, "r")
@@ -132,4 +140,5 @@ for filename in os.listdir(dirExtract2):
         else:
             log ("Not a dat file, skipping: '" + fName + "'")    
 
-log("Finished writing the combined file.")
+log("Finished reading dat files: " + str(count) + " files")
+log("Combined file has been written to '" + outFile + "'")
